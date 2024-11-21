@@ -1,7 +1,9 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace Csce552
 {
@@ -13,6 +15,8 @@ namespace Csce552
         public SphereCollider coll;
 
         public LayerMask groundMask;
+
+        public GameObject mesh;
         
         [Header("Parameters")]
         public float targetSpeed = 10f;
@@ -110,6 +114,10 @@ namespace Csce552
         {
             float forwardSpeed = Vector3.Dot(transform.forward, rbdy.velocity);
             float newSpeed = Mathf.MoveTowards(forwardSpeed, targetSpeed, acceleration * Time.deltaTime);
+
+            var newRotation = mesh.transform.rotation;
+            newRotation *= Quaternion.Euler(90,0,0);
+            mesh.transform.rotation = Quaternion.Lerp(mesh.transform.rotation, newRotation, Time.deltaTime * 8f);
 
             if (Input.GetKey(KeyCode.Space))
             {
