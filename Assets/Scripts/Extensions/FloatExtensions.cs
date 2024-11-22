@@ -85,6 +85,13 @@ namespace Csce552
             if (v.magnitude < maxMag) return v;
             return v.normalized * maxMag;
         }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Vector3 WithMaxMagnitude(this Vector3 v, float maxMag)
+        {
+            if (v.magnitude < maxMag) return v;
+            return v.normalized * maxMag;
+        }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector2 ChangeToSurface(Vector2 dir, Vector2 surfaceNormal)
@@ -110,6 +117,25 @@ namespace Csce552
         public static Vector3 CastToSurface(Vector3 dir, Vector3 surfaceNormal)
         {
             return dir - Vector3.Dot(dir, surfaceNormal) * surfaceNormal;
+        }
+
+        // Returns `v` with a value of `val` in the `dir` direction
+        public static Vector3 InDirection(this Vector3 v, Vector3 dir, float val)
+        {
+            v -= Vector3.Dot(v, dir) * dir;
+            return v + dir * val;
+        }
+
+        // Returns `v` with a max `max` magnitude in the `dir` direction
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Vector3 MaxInDirection(this Vector3 v, Vector3 dir, float max)
+        {
+            float magnitude = Vector3.Dot(v, dir);
+            v -= magnitude * dir;
+            
+            magnitude = Mathf.Min(magnitude, max);
+
+            return v + dir * magnitude;
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

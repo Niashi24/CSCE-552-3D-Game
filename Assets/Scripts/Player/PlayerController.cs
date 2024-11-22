@@ -17,6 +17,8 @@ namespace Csce552
         public LayerMask groundMask;
 
         public GameObject mesh;
+
+        public GameObject anchor;
         
         [Header("Parameters")]
         public float targetSpeed = 10f;
@@ -38,6 +40,8 @@ namespace Csce552
         public float maxBoundFallSpeed;
         public float boundFallDeceleration;
         public float boundHeightMultiplier = 1.5f;
+
+        public float rotateDecayParam = 1f;
         
         [Header("Runtime")]
         public PlayerInput playerInput;
@@ -50,7 +54,7 @@ namespace Csce552
         public float coyoteTimer;
 
         public float jumpHoldTimer;
-        public Vector3 jumpHoldForce;
+        public float jumpHoldForce;
 
         public bool canBound;
         
@@ -58,13 +62,16 @@ namespace Csce552
         public event Action OnBounce;
         public event Action OnStartBounce;
 
+        public int lane = 0;
+
         private void Update()
         {
             playerInput.Update
             (
                 Input.GetKey(KeyCode.Z),
                 Input.GetKey(KeyCode.X),
-                Input.GetAxisRaw("Horizontal")
+                Input.GetKey(KeyCode.LeftArrow),
+                Input.GetKey(KeyCode.RightArrow)
             );
         }
 
@@ -94,9 +101,12 @@ namespace Csce552
         // Update is called once per frame
         void FixedUpdate()
         {
+            transform.localPosition = transform.localPosition.WithX(0f);
             PlayerInput input = playerInput.Take();
             
             MoveForward();
+
+            HandleLaneSwitch(input);
 
             switch (playerState)
             {
@@ -107,6 +117,29 @@ namespace Csce552
                     AirUpdate(input);
                     break;
             }
+            transform.localPosition = transform.localPosition.WithX(0f);
+        }
+
+        void HandleLaneSwitch(PlayerInput input)
+        {
+            if (input.left.JustPressed && lane > -1)
+            {
+                lane -= 1;
+            }
+
+            if (input.right.JustPressed && lane < 1)
+            {
+                lane += 1;
+            }
+
+            Quaternion rotation = anchor.transform.rotation;
+
+            float curRot = rotation.eulerAngles.z;
+            float target = lane * 45f;
+            float newRot = Mathf.LerpAngle(curRot, target, 1 - Mathf.Exp(-rotateDecayParam * Time.deltaTime));
+
+            rotation.eulerAngles = rotation.eulerAngles.WithZ(newRot);
+            anchor.transform.rotation = rotation;
         }
 
         // TODO: Replace with spline pathing if necessary?
@@ -128,15 +161,20 @@ namespace Csce552
 
         void GroundUpdate(PlayerInput input)
         {
+            if (!Physics.SphereCast(rbdy.position, coll.radius, -transform.up, out var ground, 0.1f, groundMask))
+            {
+                SetState(PlayerState.Air);
+            }
+            
             // Jump
             if (input.jump.JustPressed)
             {
                 jumpBuffer = 0f;
                 var calculatedStats = JumpStats.FromMinMaxHeight(minJumpHeight, maxJumpHeight, Physics.gravity.magnitude);
                 
-                rbdy.velocity += calculatedStats.InitialVelocity * Vector3.up;
+                rbdy.velocity += calculatedStats.InitialVelocity * transform.up;
 
-                jumpHoldForce = calculatedStats.HoldForce * Vector3.up;
+                jumpHoldForce = calculatedStats.HoldForce;
                 jumpHoldTimer = calculatedStats.Time;
                 
                 OnJump?.Invoke();
@@ -180,26 +218,36 @@ namespace Csce552
             //         break;
             //     }
             // }
+
+            Vector3 down = -transform.up;
+            float downSpeed = Vector3.Dot(rbdy.velocity, down);
             
-            if (rbdy.velocity.y > -maxAirFallSpeed)
+            if (downSpeed > -maxAirFallSpeed)
             {
-                rbdy.velocity = rbdy.velocity.WithY(
-                    Mathf.MoveTowards(rbdy.velocity.y, -maxAirFallSpeed, Physics.gravity.magnitude * Time.deltaTime));
+                downSpeed = Mathf.MoveTowards(downSpeed, maxAirFallSpeed, Physics.gravity.magnitude * Time.deltaTime);
+                // rbdy.velocity += transform.up * (-Physics.gravity.magnitude * Time.deltaTime);
+                // rbdy.velocity = rbdy.velocity.MaxInDirection(down, maxAirFallSpeed);
+                rbdy.velocity = rbdy.velocity.InDirection(down, downSpeed);
+                // rbdy.velocity = rbdy.velocity.WithY(
+                //     Mathf.MoveTowards(rbdy.velocity.y, -maxAirFallSpeed, Physics.gravity.magnitude * Time.deltaTime));
             }
             else // vel <= maxBoundFallSpeed
             {
-                rbdy.velocity = rbdy.velocity.WithY(
-                    Mathf.MoveTowards(rbdy.velocity.y, -maxAirFallSpeed,
-                        airFallDeceleration * Time.deltaTime)
-                );
+                downSpeed = Mathf.MoveTowards(downSpeed, maxAirFallSpeed, airFallDeceleration * Time.deltaTime);
+                rbdy.velocity = rbdy.velocity.InDirection(down, downSpeed);
+                // rbdy.velocity = rbdy.velocity.WithY(
+                //     Mathf.MoveTowards(rbdy.velocity.y, -maxAirFallSpeed,
+                //         airFallDeceleration * Time.deltaTime)
+                // );
+
             }
             
             if (
                 (input.jump.Pressed || input.bound.Pressed) && 
                 jumpHoldTimer > 0 &&
-                Vector3.Dot(rbdy.velocity.normalized, jumpHoldForce) >= 0)
+                Vector3.Dot(rbdy.velocity.normalized, transform.up) >= 0)
             {
-                rbdy.velocity += jumpHoldForce * Time.deltaTime;
+                rbdy.velocity += jumpHoldForce * Time.deltaTime * transform.up;
                 jumpHoldTimer = (jumpHoldTimer - Time.deltaTime).AtLeast(0f);
             }
             else
@@ -213,9 +261,9 @@ namespace Csce552
                 {
                     var calculatedStats = JumpStats.FromMinMaxHeight(minJumpHeight, maxJumpHeight, Physics.gravity.magnitude);
                 
-                    rbdy.velocity += calculatedStats.InitialVelocity * Vector3.up;
+                    rbdy.velocity += calculatedStats.InitialVelocity * transform.up;
 
-                    jumpHoldForce = calculatedStats.HoldForce * Vector3.up;
+                    jumpHoldForce = calculatedStats.HoldForce;
                     jumpHoldTimer = calculatedStats.Time;
                 }
                 else
@@ -248,12 +296,18 @@ namespace Csce552
             }
         }
 
-        private void OnCollisionEnter(Collision collision)
+        private void HandleCollision(Collision collision)
         {
+            if (playerState == PlayerState.Ground)
+            {
+                rbdy.velocity -= collision.impulse;
+                return;
+            }
+            
             var hit = collision.contacts[0];
             if (collision.contacts[0].normal.y > 0f)
             {
-                Debug.Log("impulse: " + collision.impulse);
+                // Debug.Log("impulse: " + collision.impulse);
                 
                 Vector3 newDir = FloatExtensions.ChangeToSurface(rbdy.velocity.normalized, hit.normal);
                 if (playerInput.bound.Pressed && rbdy.velocity.magnitude >= minBounceSpeed)
@@ -262,7 +316,7 @@ namespace Csce552
                     rbdy.velocity = Vector3.Reflect(rbdy.velocity, hit.normal) * bounceReflectMultiplier;
                     Debug.Log(rbdy.velocity);
                     JumpStats bounceJumpStats = JumpStats.FromInitialVelAndMultiplier(rbdy.velocity.magnitude, Physics.gravity.magnitude, boundHeightMultiplier);
-                    jumpHoldForce = rbdy.velocity.normalized * bounceJumpStats.HoldForce;
+                    jumpHoldForce = bounceJumpStats.HoldForce;
                     jumpHoldTimer = bounceJumpStats.Time;
                     canBound = false;
                     // send bounce event
@@ -283,6 +337,17 @@ namespace Csce552
                     SetState(PlayerState.Ground);
                 }
             }
+            transform.localPosition = transform.localPosition.WithX(0f);
+        }
+
+        private void OnCollisionStay(Collision other)
+        {
+            HandleCollision(other);
+        }
+
+        private void OnCollisionEnter(Collision collision)
+        {
+            HandleCollision(collision);
         }
     }
 }

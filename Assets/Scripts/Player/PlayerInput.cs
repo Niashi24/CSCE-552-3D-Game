@@ -7,13 +7,25 @@ namespace Csce552
     {
         public Button jump;
         public Button bound;
-        public float move;
+        public Button left;
+        public Button right;
 
-        public void Update(bool jump, bool bound, float move)
+        public void Update(bool jump, bool bound, bool left, bool right)
         {
             this.jump.Update(jump);
             this.bound.Update(bound);
-            this.move = move;
+            this.left.Update(left);
+            this.right.Update(right);
+        }
+
+        public float Move()
+        {
+            float output = 0f;
+            if (left.Pressed)
+                output += 1f;
+            if (right.Pressed)
+                output -= 1f;
+            return output;
         }
 
         public PlayerInput Take()
@@ -22,7 +34,8 @@ namespace Csce552
             {
                 jump = jump.Take(),
                 bound = bound.Take(),
-                move = move,
+                left = left.Take(),
+                right = right.Take(),
             };
         }
     }
