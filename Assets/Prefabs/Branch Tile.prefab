@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6944733227310069995}
   - component: {fileID: 7953843566475131977}
+  - component: {fileID: 1240848810802507021}
   m_Layer: 0
   m_Name: Branch Tile
   m_TagString: Untagged
@@ -54,6 +55,20 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1.5, y: 0.5, z: 1.5}
   m_Center: {x: 0, y: 2.5, z: 0}
+--- !u!114 &1240848810802507021
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9014040100275849304}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa3e8dd019338af94a07f04bdcd5172d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  pauseHandler: {fileID: 0}
+  loseOverlay: {fileID: 0}
 --- !u!1001 &7789313857107127905
 PrefabInstance:
   m_ObjectHideFlags: 0
