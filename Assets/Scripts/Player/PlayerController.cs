@@ -172,7 +172,7 @@ namespace Csce552
 
         void GroundUpdate(PlayerInput input)
         {
-            if (!Physics.SphereCast(rbdy.position, coll.radius, -transform.up, out var ground, 0.5 groundMask))
+            if (!Physics.SphereCast(rbdy.position, coll.radius, -transform.up, out var ground, 0.5f, groundMask))
             {
                 SetState(PlayerState.Air);
             }
