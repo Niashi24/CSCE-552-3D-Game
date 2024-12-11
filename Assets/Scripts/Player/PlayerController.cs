@@ -19,6 +19,10 @@ namespace Csce552
         public GameObject mesh;
 
         public GameObject anchor;
+
+        public AudioSource audioSource;
+
+        public AudioClip jumpLandSfx;
         
         [Header("Parameters")]
         public float targetSpeed = 10f;
@@ -77,6 +81,13 @@ namespace Csce552
 
         public void SetState(PlayerState newState)
         {
+            if ((playerState == PlayerState.Ground && newState == PlayerState.Air)
+                || (playerState == PlayerState.Air && newState == PlayerState.Ground))
+            {
+                Debug.Log("played");
+                audioSource.PlayOneShot(jumpLandSfx);
+            }
+            
             // On exit
             switch (playerState)
             {
@@ -161,7 +172,7 @@ namespace Csce552
 
         void GroundUpdate(PlayerInput input)
         {
-            if (!Physics.SphereCast(rbdy.position, coll.radius, -transform.up, out var ground, 0.1f, groundMask))
+            if (!Physics.SphereCast(rbdy.position, coll.radius, -transform.up, out var ground, 0.5 groundMask))
             {
                 SetState(PlayerState.Air);
             }
