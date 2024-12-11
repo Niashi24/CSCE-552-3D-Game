@@ -637,7 +637,7 @@ GameObject:
   - component: {fileID: 263355503}
   - component: {fileID: 263355502}
   - component: {fileID: 263355501}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Mesh
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2075,7 +2075,7 @@ GameObject:
   - component: {fileID: 1199973473}
   - component: {fileID: 1199973472}
   - component: {fileID: 1199973474}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Player
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2163,13 +2163,14 @@ MonoBehaviour:
   coll: {fileID: 1199973468}
   groundMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 55
   mesh: {fileID: 263355500}
   anchor: {fileID: 1839425213}
   audioSource: {fileID: 1199973474}
   jumpLandSfx: {fileID: 8300000, guid: 3bb85b58f89062a40927a6c3ebde87de, type: 3}
   targetSpeed: 7.5
   acceleration: 19
+  speedUp: 0.05
   minJumpHeight: 1
   maxJumpHeight: 2
   coyoteTime: 0.1
@@ -2182,6 +2183,7 @@ MonoBehaviour:
   boundFallDeceleration: 1000
   boundHeightMultiplier: 1.5
   rotateDecayParam: 8
+  groundHeight: 3.1
   playerInput:
     jump:
       justPressed: 0
@@ -2210,6 +2212,8 @@ MonoBehaviour:
   jumpHoldForce: 0
   canBound: 1
   lane: 0
+  yVelocity: 0
+  forwardVelocity: 0
 --- !u!82 &1199973474
 AudioSource:
   m_ObjectHideFlags: 0
@@ -2825,6 +2829,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   player: {fileID: 1199973471}
   tileLength: 2
+  initialSegment: {fileID: 7691214066281250840, guid: d12f53453e13fa745a3e00d8ff089f3e,
+    type: 3}
   randomSegments:
   - {fileID: 7691214066281250840, guid: 35fcd54523f7c7848ba11c314126e2e3, type: 3}
   - {fileID: 7691214066281250840, guid: 062b4cf7a3d39a743a0101c3d98add90, type: 3}
@@ -3470,7 +3476,7 @@ GameObject:
   - component: {fileID: 1700458905}
   - component: {fileID: 1700458904}
   - component: {fileID: 1700458907}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Main Camera
   m_TagString: MainCamera
   m_Icon: {fileID: 0}

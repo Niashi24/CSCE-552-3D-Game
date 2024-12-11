@@ -10,6 +10,8 @@ namespace Csce552
 
         public float tileLength = 2;
 
+        public LevelSegment initialSegment;
+
         public LevelSegment[] randomSegments;
 
         public Vector3 forward = Vector3.back;
@@ -38,6 +40,8 @@ namespace Csce552
             this.offset = player.position + Vector3.down * radius;
             this.currentTiles = 0;
 
+            SpawnSegment(initialSegment);
+            
             while (currentTiles < tilesInFront)
             {
                 GenerateTile();
@@ -48,6 +52,11 @@ namespace Csce552
         {
             int tileIndex = (int)(Random.value * randomSegments.Length);
             var segment = randomSegments[tileIndex];
+            SpawnSegment(segment);
+        }
+
+        private void SpawnSegment(LevelSegment segment)
+        {
             Vector3 position = offset + currentTiles * tileLength * forward;
             segment = Instantiate(segment, position, Quaternion.identity, transform);
             currentTiles += segment.numTiles;

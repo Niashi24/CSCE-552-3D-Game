@@ -29,6 +29,8 @@ namespace Csce552
 
         public float acceleration = 50f;
 
+        public float speedUp = 0.1f;
+
         public float minJumpHeight;
         public float maxJumpHeight;
 
@@ -46,6 +48,8 @@ namespace Csce552
         public float boundHeightMultiplier = 1.5f;
 
         public float rotateDecayParam = 1f;
+
+        public float groundHeight = 3f;
         
         [Header("Runtime")]
         public PlayerInput playerInput;
@@ -68,6 +72,9 @@ namespace Csce552
 
         public int lane = 0;
 
+        public float yVelocity;
+        public float forwardVelocity;
+
         private void Update()
         {
             playerInput.Update
@@ -84,7 +91,7 @@ namespace Csce552
             if ((playerState == PlayerState.Ground && newState == PlayerState.Air)
                 || (playerState == PlayerState.Air && newState == PlayerState.Ground))
             {
-                Debug.Log("played");
+                // Debug.Log("played");
                 audioSource.PlayOneShot(jumpLandSfx);
             }
             
@@ -112,8 +119,10 @@ namespace Csce552
         // Update is called once per frame
         void FixedUpdate()
         {
+            rbdy.velocity = Vector3.zero;
             transform.localPosition = transform.localPosition.WithX(0f);
             PlayerInput input = playerInput.Take();
+            targetSpeed += speedUp * Time.deltaTime;
             
             MoveForward();
 
@@ -128,6 +137,7 @@ namespace Csce552
                     AirUpdate(input);
                     break;
             }
+            
             transform.localPosition = transform.localPosition.WithX(0f);
         }
 
@@ -156,8 +166,7 @@ namespace Csce552
         // TODO: Replace with spline pathing if necessary?
         void MoveForward()
         {
-            float forwardSpeed = Vector3.Dot(transform.forward, rbdy.velocity);
-            float newSpeed = Mathf.MoveTowards(forwardSpeed, targetSpeed, acceleration * Time.deltaTime);
+            float newSpeed = Mathf.MoveTowards(forwardVelocity, targetSpeed, acceleration * Time.deltaTime);
 
             var newRotation = mesh.transform.rotation;
             newRotation *= Quaternion.Euler(90,0,0);
@@ -167,23 +176,24 @@ namespace Csce552
             {
                 newSpeed = 0;
             }
-            rbdy.velocity += transform.forward * (newSpeed - forwardSpeed);
+
+            forwardVelocity = newSpeed;
         }
 
         void GroundUpdate(PlayerInput input)
         {
-            if (!Physics.SphereCast(rbdy.position, coll.radius, -transform.up, out var ground, 0.5f, groundMask))
-            {
-                SetState(PlayerState.Air);
-            }
-            
+            // if (!Physics.SphereCast(rbdy.position, coll.radius, -transform.up, out var ground, 0.5f, groundMask))
+            // {
+            //     SetState(PlayerState.Air);
+            // }
+            //
             // Jump
             if (input.jump.JustPressed)
             {
                 jumpBuffer = 0f;
                 var calculatedStats = JumpStats.FromMinMaxHeight(minJumpHeight, maxJumpHeight, Physics.gravity.magnitude);
-                
-                rbdy.velocity += calculatedStats.InitialVelocity * transform.up;
+
+                yVelocity += calculatedStats.InitialVelocity;
 
                 jumpHoldForce = calculatedStats.HoldForce;
                 jumpHoldTimer = calculatedStats.Time;
@@ -192,73 +202,31 @@ namespace Csce552
                 
                 SetState(PlayerState.Air);
             }
+            
+            transform.localPosition += new Vector3(0f, yVelocity, -forwardVelocity) * Time.deltaTime;
+            transform.localPosition = transform.localPosition.WithY(groundHeight);
         }
 
         void AirUpdate(PlayerInput input)
         {
-            // if (Physics.SphereCast(rbdy.position, coll.radius, -transform.up, out var ground, 0.01f, groundMask))
-            // {
-            //     if (ground.normal.y > 0)
-            //     {
-            //         Vector2 newDir = FloatExtensions.ChangeToSurface(velocity.normalized, hit.normal);
-            //         if (input.bound.Pressed && newDir.magnitude < cosMinAngle - 0.01f && velocity.magnitude >= minBounceSpeed)
-            //         {
-            //             velocity = velocity.Reflect(hit.normal) * bounceReflectMultiplier;
-            //             JumpStats bounceJumpStats = JumpStats.FromInitialVelAndMultiplier(velocity.magnitude, Physics2D.gravity.magnitude, boundHeightMultiplier);
-            //             jumpHoldForce = velocity.normalized * bounceJumpStats.HoldForce;
-            //             jumpHoldTimer = bounceJumpStats.Time.Log();
-            //             canBound = false;
-            //             // send bounce event
-            //             OnBounce?.Invoke();
-            //         }
-            //         else
-            //         {
-            //             var oldVelocity = velocity;
-            //             velocity = velocity.WithDirection(newDir.normalized);
-            //     
-            //             // if ground is smooth enough, keep all speed
-            //             // otherwise lose speed
-            //             if (newDir.magnitude + 0.02f < cosMinAngle)
-            //             {
-            //                 velocity *= newDir.magnitude;
-            //                 Debug.Log($"Lost momentum (hard hit): {velocity.magnitude - oldVelocity.magnitude} from change: {newDir.magnitude}");
-            //             }
-            //             SetState(PlayerState.Ground);
-            //         }
-            //         
-            //         break;
-            //     }
-            // }
 
             Vector3 down = -transform.up;
-            float downSpeed = Vector3.Dot(rbdy.velocity, down);
-            
-            if (downSpeed > -maxAirFallSpeed)
+            if (yVelocity > -maxAirFallSpeed)
             {
-                downSpeed = Mathf.MoveTowards(downSpeed, maxAirFallSpeed, Physics.gravity.magnitude * Time.deltaTime);
-                // rbdy.velocity += transform.up * (-Physics.gravity.magnitude * Time.deltaTime);
-                // rbdy.velocity = rbdy.velocity.MaxInDirection(down, maxAirFallSpeed);
-                rbdy.velocity = rbdy.velocity.InDirection(down, downSpeed);
-                // rbdy.velocity = rbdy.velocity.WithY(
-                //     Mathf.MoveTowards(rbdy.velocity.y, -maxAirFallSpeed, Physics.gravity.magnitude * Time.deltaTime));
+                yVelocity = Mathf.MoveTowards(yVelocity, -maxAirFallSpeed, Physics.gravity.magnitude * Time.deltaTime);
             }
             else // vel <= maxBoundFallSpeed
             {
-                downSpeed = Mathf.MoveTowards(downSpeed, maxAirFallSpeed, airFallDeceleration * Time.deltaTime);
-                rbdy.velocity = rbdy.velocity.InDirection(down, downSpeed);
-                // rbdy.velocity = rbdy.velocity.WithY(
-                //     Mathf.MoveTowards(rbdy.velocity.y, -maxAirFallSpeed,
-                //         airFallDeceleration * Time.deltaTime)
-                // );
+                yVelocity = Mathf.MoveTowards(yVelocity, -maxAirFallSpeed, airFallDeceleration * Time.deltaTime);
 
             }
             
             if (
                 (input.jump.Pressed || input.bound.Pressed) && 
                 jumpHoldTimer > 0 &&
-                Vector3.Dot(rbdy.velocity.normalized, transform.up) >= 0)
+                yVelocity >= 0)
             {
-                rbdy.velocity += jumpHoldForce * Time.deltaTime * transform.up;
+                yVelocity += jumpHoldForce * Time.deltaTime;
                 jumpHoldTimer = (jumpHoldTimer - Time.deltaTime).AtLeast(0f);
             }
             else
@@ -271,8 +239,8 @@ namespace Csce552
                 if (coyoteTimer > 0)
                 {
                     var calculatedStats = JumpStats.FromMinMaxHeight(minJumpHeight, maxJumpHeight, Physics.gravity.magnitude);
-                
-                    rbdy.velocity += calculatedStats.InitialVelocity * transform.up;
+
+                    yVelocity += calculatedStats.InitialVelocity;
 
                     jumpHoldForce = calculatedStats.HoldForce;
                     jumpHoldTimer = calculatedStats.Time;
@@ -295,58 +263,70 @@ namespace Csce552
             
             if (canBound && input.bound.Pressed)
             {
-                if (rbdy.velocity.y > -maxBoundFallSpeed)
+                if (yVelocity > -maxBoundFallSpeed)
                 {
-                    rbdy.velocity = rbdy.velocity.WithY(Mathf.MoveTowards(rbdy.velocity.y, -maxBoundFallSpeed, boundForce * Time.deltaTime));
+                    yVelocity = Mathf.MoveTowards(yVelocity, -maxBoundFallSpeed, boundForce * Time.deltaTime);
                 }
                 else // vel <= maxBoundFallSpeed
                 {
-                    rbdy.velocity = rbdy.velocity.WithY(Mathf.MoveTowards(rbdy.velocity.y, -maxBoundFallSpeed,
-                        boundFallDeceleration * Time.deltaTime));
+                    yVelocity = Mathf.MoveTowards(yVelocity, -maxBoundFallSpeed,
+                        boundFallDeceleration * Time.deltaTime);
                 }
+            }
+            
+            
+
+            transform.localPosition += new Vector3(0f, yVelocity, -forwardVelocity) * Time.deltaTime;
+
+            if (transform.localPosition.y < groundHeight)
+            {
+                yVelocity = 0;
+                transform.localPosition = transform.localPosition.WithY(groundHeight);
+                SetState(PlayerState.Ground);
             }
         }
 
         private void HandleCollision(Collision collision)
         {
-            if (playerState == PlayerState.Ground)
-            {
-                rbdy.velocity -= collision.impulse;
-                return;
-            }
+            // if (playerState == PlayerState.Ground)
+            // {
+            //     rbdy.velocity -= collision.impulse;
+            //     return;
+            // }
             
             var hit = collision.contacts[0];
-            if (collision.contacts[0].normal.y > 0f)
+            if (playerState == PlayerState.Air && collision.contacts[0].normal.y > 0f)
             {
+                
+                SetState(PlayerState.Ground);
                 // Debug.Log("impulse: " + collision.impulse);
                 
-                Vector3 newDir = FloatExtensions.ChangeToSurface(rbdy.velocity.normalized, hit.normal);
-                if (playerInput.bound.Pressed && rbdy.velocity.magnitude >= minBounceSpeed)
-                {
-                    rbdy.velocity -= collision.contacts[0].impulse;
-                    rbdy.velocity = Vector3.Reflect(rbdy.velocity, hit.normal) * bounceReflectMultiplier;
-                    Debug.Log(rbdy.velocity);
-                    JumpStats bounceJumpStats = JumpStats.FromInitialVelAndMultiplier(rbdy.velocity.magnitude, Physics.gravity.magnitude, boundHeightMultiplier);
-                    jumpHoldForce = bounceJumpStats.HoldForce;
-                    jumpHoldTimer = bounceJumpStats.Time;
-                    canBound = false;
-                    // send bounce event
-                    OnBounce?.Invoke();
-                }
-                else
-                {
-                    var oldVelocity = rbdy.velocity;
-                    rbdy.velocity = rbdy.velocity.WithDirection(newDir.normalized);
-                
-                    // if ground is smooth enough, keep all speed
-                    // otherwise lose speed
-                    // if (newDir.magnitude + 0.02f < cosMinAngle)
-                    // {
-                    //     velocity *= newDir.magnitude;
-                    //     Debug.Log($"Lost momentum (hard hit): {velocity.magnitude - oldVelocity.magnitude} from change: {newDir.magnitude}");
-                    // }
-                    SetState(PlayerState.Ground);
-                }
+                // Vector3 newDir = FloatExtensions.ChangeToSurface(rbdy.velocity.normalized, hit.normal);
+                // if (playerInput.bound.Pressed && rbdy.velocity.magnitude >= minBounceSpeed)
+                // {
+                //     rbdy.velocity -= collision.contacts[0].impulse;
+                //     rbdy.velocity = Vector3.Reflect(rbdy.velocity, hit.normal) * bounceReflectMultiplier;
+                //     Debug.Log(rbdy.velocity);
+                //     JumpStats bounceJumpStats = JumpStats.FromInitialVelAndMultiplier(rbdy.velocity.magnitude, Physics.gravity.magnitude, boundHeightMultiplier);
+                //     jumpHoldForce = bounceJumpStats.HoldForce;
+                //     jumpHoldTimer = bounceJumpStats.Time;
+                //     canBound = false;
+                //     // send bounce event
+                //     OnBounce?.Invoke();
+                // }
+                // else
+                // {
+                //     var oldVelocity = rbdy.velocity;
+                //     rbdy.velocity = rbdy.velocity.WithDirection(newDir.normalized);
+                //
+                //     // if ground is smooth enough, keep all speed
+                //     // otherwise lose speed
+                //     // if (newDir.magnitude + 0.02f < cosMinAngle)
+                //     // {
+                //     //     velocity *= newDir.magnitude;
+                //     //     Debug.Log($"Lost momentum (hard hit): {velocity.magnitude - oldVelocity.magnitude} from change: {newDir.magnitude}");
+                //     // }
+                // }
             }
             transform.localPosition = transform.localPosition.WithX(0f);
         }
