@@ -9,6 +9,7 @@ namespace Csce552
     {
         public Animator animator;
         public bool collected;
+        public AudioSource audioSource;
         public AudioClip collectSfx;
         public int score = 100;
 
@@ -27,8 +28,7 @@ namespace Csce552
                 EventManager.AddScore(score);
                 collected = true;
                 animator.Play("Collected");
-                AudioSource.PlayClipAtPoint(collectSfx, this.gameObject.transform.position);
-                Destroy(this.gameObject);
+                audioSource.PlayOneShot(collectSfx);
             }
         }
     }
