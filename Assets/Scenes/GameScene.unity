@@ -2530,7 +2530,9 @@ MonoBehaviour:
   mesh: {fileID: 263355500}
   anchor: {fileID: 1839425213}
   audioSource: {fileID: 1199973474}
-  jumpLandSfx: {fileID: 8300000, guid: 3bb85b58f89062a40927a6c3ebde87de, type: 3}
+  jumpSfx: {fileID: 8300000, guid: 0d5ec38592ab08f4f8180cc1a1044eca, type: 3}
+  landSfx: {fileID: 8300000, guid: b50687581ab56964ebee128b8f4d407a, type: 3}
+  rollSfx: {fileID: 8300000, guid: 3bb85b58f89062a40927a6c3ebde87de, type: 3}
   targetSpeed: 7.5
   acceleration: 19
   speedUp: 0.2

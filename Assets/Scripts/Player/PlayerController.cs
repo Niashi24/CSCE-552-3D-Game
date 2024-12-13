@@ -22,7 +22,9 @@ namespace Csce552
 
         public AudioSource audioSource;
 
-        public AudioClip jumpLandSfx;
+        public AudioClip jumpSfx;
+        public AudioClip landSfx;
+        public AudioClip rollSfx;
         
         [Header("Parameters")]
         public float targetSpeed = 10f;
@@ -88,11 +90,14 @@ namespace Csce552
 
         public void SetState(PlayerState newState)
         {
-            if ((playerState == PlayerState.Ground && newState == PlayerState.Air)
-                || (playerState == PlayerState.Air && newState == PlayerState.Ground))
+            if (playerState == PlayerState.Ground && newState == PlayerState.Air)
+            {
+                audioSource.PlayOneShot(jumpSfx);
+            } 
+            else if (playerState == PlayerState.Air && newState == PlayerState.Ground)
             {
                 // Debug.Log("played");
-                audioSource.PlayOneShot(jumpLandSfx);
+                audioSource.PlayOneShot(landSfx);
             }
             
             // On exit
