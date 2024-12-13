@@ -3682,6 +3682,11 @@ MonoBehaviour:
   - {fileID: 7691214066281250840, guid: 35fcd54523f7c7848ba11c314126e2e3, type: 3}
   - {fileID: 7691214066281250840, guid: 062b4cf7a3d39a743a0101c3d98add90, type: 3}
   - {fileID: 7691214066281250840, guid: ef8bf40b6b743ad4b920bbeb34bd7a2b, type: 3}
+  - {fileID: 7691214066281250840, guid: 53d704c45f7762e5f91d6f4b24bcfdc7, type: 3}
+  - {fileID: 7691214066281250840, guid: 8957c8f907bd75d3bb07026d2abe6378, type: 3}
+  - {fileID: 7691214066281250840, guid: abe286a7b46cb38e99983401d904a6c7, type: 3}
+  - {fileID: 7691214066281250840, guid: 6dd4f3a6b3d791400a9ba842966f3210, type: 3}
+  - {fileID: 7691214066281250840, guid: 4d21e74729f0142a0b10c23d6ffd7751, type: 3}
   forward: {x: 0, y: 0, z: -1}
   tilesInFront: 20
   tilesBehind: 5
@@ -5705,7 +5710,7 @@ PrefabInstance:
     - target: {fileID: 7691214066281250840, guid: 35fcd54523f7c7848ba11c314126e2e3,
         type: 3}
       propertyPath: numTiles
-      value: 11
+      value: 12
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
