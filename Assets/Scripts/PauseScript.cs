@@ -9,13 +9,25 @@ namespace Csce552
     public class PauseScript : MonoBehaviour
     {
         public GameObject pauseOverlay;
+        public GameObject loseOverlay;
 
         // Update is called once per frame
         void Update()
         {
             if (Input.GetKeyDown(KeyCode.Escape))
             {
-                Pause();
+                Debug.Log(Time.timeScale);
+                if(loseOverlay.activeInHierarchy == false)
+                {
+                    if(Time.timeScale != 0)   
+                    {   
+                        Pause();
+                    }
+                    else
+                    {
+                        Unpause();
+                    }
+                }
             }
         }
 
@@ -24,14 +36,14 @@ namespace Csce552
             AudioListener.pause = true;
             pauseOverlay.SetActive(true);
             Time.timeScale = 0;
-            enabled = false;
+            //enabled = false;
         }
 
         public void PauseNooverlay()
         {
             AudioListener.pause = true;
             Time.timeScale = 0;
-            enabled = false;
+            //enabled = false;
         }
 
         public void Unpause()
@@ -39,7 +51,7 @@ namespace Csce552
             AudioListener.pause = false;
             pauseOverlay.SetActive(false);
             Time.timeScale = 1;
-            enabled = true;
+            //enabled = true;
         }
     }
 }

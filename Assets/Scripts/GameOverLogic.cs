@@ -11,20 +11,21 @@ namespace Csce552
         {
             AudioListener.pause = false;
             Time.timeScale = 1;
-            enabled = true;
+            //enabled = true;
             SceneManager.LoadScene("GameScene");
         }
+        /*
         public void RestartCheckpoint() {
             AudioListener.pause = false;
             Time.timeScale = 1;
             enabled = true;
             SceneManager.LoadScene("GameScene");
-        }
+        }*/
         public void ToMainMenu()
         {
             AudioListener.pause = false;
             Time.timeScale = 1;
-            enabled = true;
+            //enabled = true;
             SceneManager.LoadScene("MenuScene");
         }
     }

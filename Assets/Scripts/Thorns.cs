@@ -12,7 +12,7 @@ namespace Csce552
         public GameObject loseOverlay;
         private void Awake() {
             pauseHandler = GameObject.Find("PauseHandler");
-            loseOverlay = GameObject.Find("LoseOverlayObject").transform.GetChild(0).gameObject;
+            loseOverlay = GameObject.Find("Canvas").transform.GetChild(1).gameObject;
         }
         private void OnTriggerEnter(Collider other)
             {
