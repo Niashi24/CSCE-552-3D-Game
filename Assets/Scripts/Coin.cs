@@ -9,6 +9,8 @@ namespace Csce552
     {
         public Animator animator;
         public bool collected;
+        public AudioSource audioSource;
+        public AudioClip collectSfx;
 
         public void SpawnIn()
         {
@@ -25,6 +27,7 @@ namespace Csce552
                 // TODO: Increase score
                 collected = true;
                 animator.Play("Collected");
+                audioSource.PlayOneShot(collectSfx);
             }
         }
     }
