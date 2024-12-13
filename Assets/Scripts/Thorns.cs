@@ -15,9 +15,9 @@ namespace Csce552
             loseOverlay = GameObject.Find("Canvas").transform.GetChild(1).gameObject;
         }
         private void OnTriggerEnter(Collider other)
-            {
-                pauseHandler.GetComponent<PauseScript>().PauseNooverlay();
-                loseOverlay.SetActive(true);
-            }
+        {
+            pauseHandler.GetComponent<PauseScript>().PauseNooverlay();
+            loseOverlay.SetActive(true);
+        }
     }
 }
