@@ -77,6 +77,10 @@ namespace Csce552
         public float yVelocity;
         public float forwardVelocity;
 
+        public int score;
+        public float scoreDisplacement;
+        public float scoreMultiplier = 0.5f;
+
         private void Update()
         {
             playerInput.Update
@@ -133,6 +137,8 @@ namespace Csce552
 
             HandleLaneSwitch(input);
 
+            float before = transform.localPosition.z;
+
             switch (playerState)
             {
                 case PlayerState.Ground:
@@ -141,6 +147,15 @@ namespace Csce552
                 case PlayerState.Air:
                     AirUpdate(input);
                     break;
+            }
+            
+            float after = transform.localPosition.z;
+            
+            scoreDisplacement += (before - after) * scoreMultiplier;
+            if ((int)scoreDisplacement > score)
+            {
+                EventManager.AddScore((int)scoreDisplacement - score);
+                score = (int)scoreDisplacement;
             }
             
             transform.localPosition = transform.localPosition.WithX(0f);

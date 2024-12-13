@@ -2636,7 +2636,7 @@ MonoBehaviour:
   targetSpeed: 7.5
   acceleration: 19
   speedUp: 0.2
-  minJumpHeight: 1
+  minJumpHeight: 0.5
   maxJumpHeight: 2
   coyoteTime: 0.1
   maxAirFallSpeed: 60
@@ -2679,6 +2679,9 @@ MonoBehaviour:
   lane: 0
   yVelocity: 0
   forwardVelocity: 0
+  score: 0
+  scoreDisplacement: 0
+  scoreMultiplier: 0.5
 --- !u!82 &1199973474
 AudioSource:
   m_ObjectHideFlags: 0
