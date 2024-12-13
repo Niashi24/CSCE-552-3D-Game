@@ -11,6 +11,7 @@ namespace Csce552
         public bool collected;
         public AudioSource audioSource;
         public AudioClip collectSfx;
+        public int score = 100;
 
         public void SpawnIn()
         {
@@ -24,7 +25,7 @@ namespace Csce552
             
             if (other.CompareTag("Player"))
             {
-                // TODO: Increase score
+                EventManager.AddScore(score);
                 collected = true;
                 animator.Play("Collected");
                 audioSource.PlayOneShot(collectSfx);
