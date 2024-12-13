@@ -680,7 +680,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &431664480
 RectTransform:
   m_ObjectHideFlags: 0
@@ -902,7 +902,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &679080340
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2607,8 +2607,8 @@ MonoBehaviour:
   m_text: To play Tree Trunk Trek, first press the play button on the main menu.
     You play as Bondi, a rubber ducky rolly polly trying to make it as far on the
     tree trunk as possible. Make sure to avoid the obstacles and don't fall off the
-    side! Use the left and right arrow keys to move left and right, and the Z key
-    to jump. Watch out, because the game gets faster as you go along!
+    side! Use the left and right arrow keys to move left and right, and the space
+    bar to jump. Watch out, because the game gets faster as you go along!
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
