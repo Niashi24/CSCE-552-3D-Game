@@ -11,35 +11,26 @@ namespace Csce552
         public GameObject loseOverlay;
         public GameObject model;
 
-        private Animator animator;
+        public Animator animator;
+        public string animationToPlay;
 
         private void Awake()
         {
             pauseHandler = GameObject.Find("PauseHandler");
             loseOverlay = GameObject.Find("Canvas").transform.GetChild(1).gameObject;
-            animator = model.GetComponent<Animator>();
-        }
-
-        // Update is called once per frame
-        void Update()
-        {
-            
-            if(animator.GetCurrentAnimatorStateInfo(0).length > animator.GetCurrentAnimatorStateInfo(0).normalizedTime)
-            {
-                return;
-            }
-            else
-            {
-                transform.Rotate(Vector3.back, 40.0f);
-                animator.Play(0);
-            }
-            
+            animator.speed = 0f;
         }
 
         private void OnTriggerEnter(Collider other)
         {
             pauseHandler.GetComponent<PauseScript>().PauseNooverlay();
             loseOverlay.SetActive(true);
+        }
+
+        public void SpawnIn()
+        {
+            animator.speed = 2.5f;
+            animator.Play(animationToPlay);
         }
     }
 }

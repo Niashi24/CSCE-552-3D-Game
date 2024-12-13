@@ -85,7 +85,7 @@ namespace Csce552
         {
             playerInput.Update
             (
-                Input.GetKey(KeyCode.Z),
+                Input.GetKey(KeyCode.Space),
                 Input.GetKey(KeyCode.X),
                 Input.GetKey(KeyCode.LeftArrow),
                 Input.GetKey(KeyCode.RightArrow)
@@ -191,11 +191,6 @@ namespace Csce552
             var newRotation = mesh.transform.rotation;
             newRotation *= Quaternion.Euler(90,0,0);
             mesh.transform.rotation = Quaternion.Lerp(mesh.transform.rotation, newRotation, Time.deltaTime * 8f);
-
-            if (Input.GetKey(KeyCode.Space))
-            {
-                newSpeed = 0;
-            }
 
             forwardVelocity = newSpeed;
         }

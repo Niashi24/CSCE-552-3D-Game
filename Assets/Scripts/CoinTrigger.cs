@@ -11,7 +11,6 @@ namespace Csce552
 
         private void OnTriggerEnter(Collider other)
         {
-            print("123");
             if (other.CompareTag("Player"))
             {
                 coin.SpawnIn();
