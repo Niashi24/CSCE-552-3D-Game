@@ -10,13 +10,14 @@ namespace Csce552
     {
         public GameObject pauseOverlay;
         public GameObject loseOverlay;
+        public AudioSource audioSource;
+        public AudioClip gameOverSfx;
 
         // Update is called once per frame
         void Update()
         {
             if (Input.GetKeyDown(KeyCode.Escape))
             {
-                Debug.Log(Time.timeScale);
                 if(loseOverlay.activeInHierarchy == false)
                 {
                     if(Time.timeScale != 0)   
@@ -41,7 +42,8 @@ namespace Csce552
 
         public void PauseNooverlay()
         {
-            AudioListener.pause = true;
+            //AudioListener.pause = true;
+            audioSource.PlayOneShot(gameOverSfx);
             Time.timeScale = 0;
             //enabled = false;
         }
