@@ -69,7 +69,6 @@ namespace Csce552
         public bool canBound;
         
         public event Action OnJump;
-        public event Action OnBounce;
         public event Action OnStartBounce;
 
         public int lane = 0;

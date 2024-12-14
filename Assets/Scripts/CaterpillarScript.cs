@@ -13,6 +13,7 @@ namespace Csce552
 
         public Animator animator;
         public string animationToPlay;
+        public float animationSpeed = 1f;
 
         private void Awake()
         {
@@ -29,7 +30,7 @@ namespace Csce552
 
         public void SpawnIn()
         {
-            animator.speed = 2.5f;
+            animator.speed = animationSpeed;
             animator.Play(animationToPlay);
         }
     }

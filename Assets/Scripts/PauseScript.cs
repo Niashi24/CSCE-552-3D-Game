@@ -34,7 +34,7 @@ namespace Csce552
 
         public void Pause()
         {
-            AudioListener.pause = true;
+            // AudioListener.pause = true;
             pauseOverlay.SetActive(true);
             Time.timeScale = 0;
             //enabled = false;
@@ -50,7 +50,7 @@ namespace Csce552
 
         public void Unpause()
         {
-            AudioListener.pause = false;
+            // AudioListener.pause = false;
             pauseOverlay.SetActive(false);
             Time.timeScale = 1;
             //enabled = true;
